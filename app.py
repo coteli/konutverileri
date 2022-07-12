@@ -5,10 +5,12 @@ import numpy as np
 import dash_bootstrap_components as dbc
 from datetime import timedelta
 
-from urllib.request import urlopen #Haritalar için GeoJson bilgilerini almak için gerekli kütüphaneler
+# Haritalar için GeoJson bilgilerini almak için gerekli kütüphaneler
+from urllib.request import urlopen
 import json
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+app.title = "Dash Visualization"
 server = app.server
 
 # dataFramelerin düzenlenmesi
@@ -22,10 +24,11 @@ df_cinsiyet_toplam.rename(
     columns={"index": "Cinsiyet", 0: "Toplam Satış"}, inplace=True)
 df_2021_eksik = pd.read_csv("harita.csv")
 
-#Türkiye İller GeoJson verilerinin webden çekilemesi
+# Türkiye İller GeoJson verilerinin webden çekilemesi
 with urlopen('https://raw.githubusercontent.com/cihadturhan/tr-geojson/master/geo/tr-cities-utf8.json') as response:
-    geojson = json.load(response) #Cihad Turhan'a teşekkürler
-geojson["features"][2]["properties"] = {'name':'Afyonkarahisar'} #Mevcut verilerle Geojson verilerinin eşleştirilmesi
+    geojson = json.load(response)  # Cihad Turhan'a teşekkürler
+# Mevcut verilerle Geojson verilerinin eşleştirilmesi
+geojson["features"][2]["properties"] = {'name': 'Afyonkarahisar'}
 
 # Son 24 aya ait verilerin öne çıkarılarak grafiğin gösterilmesi
 # Grafiğin x eksenini interaktif hale getirmek için başlangıç ve bitiş değerlerinin son 24 dönemi ifade edecek şekilde string olarak bir liste içerisine tanımlanması
@@ -97,16 +100,18 @@ fig8.update_traces(textinfo='percent+label')
 fig8.update_layout(showlegend=False)
 
 fig9 = px.choropleth_mapbox(df_2021_eksik, geojson=geojson, color="value",
-                           locations="variable", featureidkey="properties.name",
-                           center={"lat": 39, "lon": 35.5},
-                           opacity=.6,
-                           mapbox_style="carto-positron", zoom=4.7,
-                           color_continuous_scale = ["Darkgreen", "Yellow", "Red"],
-                           labels={"variable":"Şehir", "value":"Satış Adedi"})
-fig9.update_layout(margin={"r":0,"t":5,"l":0,"b":0})
+                            locations="variable", featureidkey="properties.name",
+                            center={"lat": 39, "lon": 35.5},
+                            opacity=.6,
+                            mapbox_style="carto-positron", zoom=4.7,
+                            color_continuous_scale=[
+                                "Darkgreen", "Yellow", "Red"],
+                            labels={"variable": "Şehir", "value": "Satış Adedi"})
+fig9.update_layout(margin={"r": 0, "t": 5, "l": 0, "b": 0})
 
 app.layout = dbc.Container(html.Div(children=[
-    html.H1(children='Türkiye Konut Satış Verileri - Görselleştirme', className="mt-5"),
+    html.H1(children='Türkiye Konut Satış Verileri - Görselleştirme',
+            className="mt-5"),
     html.Hr(),
 
     html.H3(children="Toplam Konut Satışları"),
@@ -130,7 +135,7 @@ app.layout = dbc.Container(html.Div(children=[
         dbc.Col([
             html.H5(children="Satış Şekline Göre Konut Satışları"),
             dcc.Graph(id='satis-sekli', figure=fig2)
-        ], md=6,className="text-center"),
+        ], md=6, className="text-center"),
     ], align="center"),
 
     html.Hr(),
@@ -184,7 +189,7 @@ app.layout = dbc.Container(html.Div(children=[
     html.H3(children="Harita"),
     html.P(children="Türkiye'de yapılan konut satışlarının %30'undan fazlası İstanbul, Ankara ve İzmir illerinde yapılmaktadır. Haritanın daha anlamlı görülebilmesi için bu üç büyük ile ait rakamlar haritada gösterilmemiştir. (İstanbul: 276.223 Adet, Ankara: 144.104 Adet, İzmir: 86.722 Adet)"),
     html.H5(children="2021 Yılı İl Bazında Yapılan Satışlar"),
-    
+
     dcc.Graph(
         id='harita',
         figure=fig9,
