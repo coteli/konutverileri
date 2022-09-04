@@ -88,7 +88,7 @@ fig6 = px.pie(df_uyruklar_toplam, values="Toplam", names="Ülke", hole=.3)
 fig6.update_traces(textinfo='percent+label', textposition='inside')
 fig6.update_layout(showlegend=False)
 
-fig7 = px.bar(df_cinsiyet_yıl_toplam, x="Yıl", y=["Erkek", "Kadın", "Ortak", "Diğer"], barmode="group",
+fig7 = px.bar(df_cinsiyet_yıl_toplam, x="Yıl", y=["Erkek", "Kadın", "Diğer", "Ortak"], barmode="group",
               labels={"value": "Adet", "variable": "Cinsiyet"})
 fig7.update_layout(legend=dict(
     title=""
